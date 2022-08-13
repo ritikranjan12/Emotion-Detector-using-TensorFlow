@@ -112,7 +112,7 @@ def live_Capture():
                     else:
                         emotion.append(res)       
         except:
-            label1.configure(foreground='#011638',text="Unavailabel to detect")
+            label1.configure(foreground='#011638',text="Unable to detect")
 
         if len(emotion) > 5: 
             emotion = emotion[-5:]
