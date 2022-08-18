@@ -30,22 +30,22 @@ facec = cv2.CascadeClassifier('hface.xml')
 mouthc = cv2.CascadeClassifier('hmouth.xml')
 eyec = cv2.CascadeClassifier('hteye.xml')
 
+
 model = facialExpressionModel('model_a.json','model_weights.h5')
 
 Emotions = ['Angry','Disgust','Fear','Happy','Neutral','Sad','Surprise']
 
+
 def detect(file_path):
     global Label_packed
-
     img = cv2.imread(file_path)
 
     gray_img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     faces = facec.detectMultiScale(gray_img,1.3,5)
     mouths =  mouthc.detectMultiScale(gray_img,1.3,5)
     eyes = eyec.detectMultiScale(gray_img,1.3,5)
-    mout='Not Detected'
-    eye='Closed'
-
+    mout=''
+    eye=''
     try:
         for(x,y,w,h) in faces:
             fc = gray_img[y:y+h,x:x+w]
@@ -53,20 +53,21 @@ def detect(file_path):
             pred = model.predict(rel[np.newaxis,:,:,np.newaxis])
             res = Emotions[np.argmax(pred)]
             print(res)
+            label1.configure(foreground='#011638',text=res)
 
         for (ex,ey,ew,eh) in mouths:
 
             #print(ex,ey,ew,eh)
             if abs(ew-eh) <31:
-                mout = "Opened"
+                mout = "Mouth Opened"
             else:
-                mout = "Closed"              
+                mout = "Mouth Closed"              
 
             cv2.rectangle(gray_img,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
         for (ex,ey,ew,eh) in eyes:
-            eye = 'Opened'
-
-        label1.configure(foreground='#011638',text="Emotion :- "+res+' Eyes :- '+eye+' Mouth :- '+mout)
+            eye = 'Eye is Opened'
+        print(mout,eye)
+        
     except:
         label1.configure(foreground='#011638',text="Unavailabel to detect")
 
@@ -78,33 +79,33 @@ def show_detectButton(file_path):
 
 
 def upload_image():
-    try:
-        file_path = filedialog.askopenfile()
-        print(file_path)
-        uploaded = Image.open(file_path.name)
-        uploaded.thumbnail(((top.winfo_width()/2.3),(top.winfo_height()/2.3)))
-        im = ImageTk.PhotoImage(uploaded)
+    show_detectButton('./th.jpeg')
+    # try:
+    #     file_path = filedialog.askopenfile('./data')
+    #     print('./data'+file_path)
+    #     uploaded = Image.open(file_path)
+    #     uploaded.thumbnail(((top.winfo_width()/2.3),(top.winfo_height()/2.3)))
+    #     im = ImageTk.PhotoImage(uploaded)
 
-        sign_image.configure(image = im)
+    #     sign_image.configure(image = im)
 
-        sign_image.image = im
-        label1.configure(text='')
-        print('File UIploaded')
-        show_detectButton(file_path.name)
+    #     sign_image.image = im
+    #     label1.configure(text='')
+    #     print('File UIploaded')
+    #     show_detectButton(file_path)
         
 
-    except:
-        print("Error in Uploading")
+    # except:
+    #     print("Error in Uploading")
 
 
 def live_Capture():
-    emotion = []
-    eye = ''
+    Eye = ''
     mouth = "Not Detected"
+    emotion = []
     cap = cv2.VideoCapture(0)
 
     while True:
-
 
         succ,img = cap.read()
 
@@ -115,7 +116,9 @@ def live_Capture():
         mouths =  mouthc.detectMultiScale(gray_img,1.3,5)
         eyes = eyec.detectMultiScale(gray_img,1.3,5)
 
+        
         try:
+           
             for(x,y,w,h) in faces:
                 fc = gray_img[y:y+h,x:x+w]
                 rel = cv2.resize(fc,(48,48))
@@ -134,23 +137,47 @@ def live_Capture():
                             if Emotions[np.argmax(pred)] != emotion[-1]:
                                 emotion.append(res)      
                     else:
-                        emotion.append(res)       
+                        emotion.append(res)  
+           
         except:
             label1.configure(foreground='#011638',text="Unable to detect")
 
         if len(emotion) > 5: 
             emotion = emotion[-5:]
 
+        #print(mouths)
         for (ex,ey,ew,eh) in mouths:
-            cv2.rectangle(img,(ex,ey),(ex+ew,ey+eh),(0,255,0),2) 
+
+            #print(ex,ey,ew,eh)
+            if abs(ew-eh) <31:
+                m = "Mouth Opened"
+            else:
+                m = "Mouth Closed"
 
         for (ex,ey,ew,eh) in eyes:
             cv2.rectangle(img,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)   
 
+        print(m)
+                 
+        
+
+        
+        
+            
+        
+        
 
         cv2.rectangle(img, (0,0), (640, 40), (245, 117, 16), -1)
+
         cv2.putText(img, ' '.join(emotion), (3,30), 
                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(img, str(leye), (3,60), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(img, str(reye), (3,90), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(img, str(mouth), (3,110), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+
         cv2.imshow("Emotion Detector",img)
 
         if cv2.waitKey(10) & 0xff == ord('q'):
