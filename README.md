@@ -30,13 +30,14 @@ Then select your Desired choice of Detection.
 
 The following imags were used to test our program.
 
-![alt text](http://github.com/ritikranjan12/Emotion-Detector-using-TensorFlow/blob/ritik/t1.png?raw=true)
-![alt text](http://github.com/ritikranjan12/Emotion-Detector-using-TensorFlow/blob/ritik/t2.png?raw=true)
+
+![Input 1](http://github.com/ritikranjan12/Emotion-Detector-using-TensorFlow/blob/ritik/t1.png?raw=true)
+![Input 2](http://github.com/ritikranjan12/Emotion-Detector-using-TensorFlow/blob/ritik/t2.png?raw=true)
 
 After passing in our program the output obtained is
 
-![alt text](http://github.com/ritikranjan12/Emotion-Detector-using-TensorFlow/blob/ritik/o1.png?raw=true)
-![alt text](http://github.com/ritikranjan12/Emotion-Detector-using-TensorFlow/blob/ritik/o2.png?raw=true)
+![Output 1](http://github.com/ritikranjan12/Emotion-Detector-using-TensorFlow/blob/ritik/o1.png?raw=true)
+![Output 2](http://github.com/ritikranjan12/Emotion-Detector-using-TensorFlow/blob/ritik/o2.png?raw=true)
 
 
 ### Thank you!
