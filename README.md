@@ -34,7 +34,7 @@ The following imags were used to test our program.
 ![Input 1](http://github.com/ritikranjan12/Emotion-Detector-using-TensorFlow/blob/main/t1.png?raw=true)
 ![Input 2](http://github.com/ritikranjan12/Emotion-Detector-using-TensorFlow/blob/main/t2.png?raw=true)
 
-After passing in our program the output obtained is
+### After passing in our program the output obtained is
 
 ![Output 1](http://github.com/ritikranjan12/Emotion-Detector-using-TensorFlow/blob/main/o1.png?raw=true)
 ![Output 2](http://github.com/ritikranjan12/Emotion-Detector-using-TensorFlow/blob/main/o2.png?raw=true)
