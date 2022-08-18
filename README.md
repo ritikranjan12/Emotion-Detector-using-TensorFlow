@@ -26,4 +26,17 @@ Type the following command in the terminal
 ```
 Then select your Desired choice of Detection.
 
+## Examples 
+
+The following imags were used to test our program.
+
+// t1
+//t2
+
+After passing in our program the output obtained is
+
+// o1
+// o2
+
+
 ### Thank you!
