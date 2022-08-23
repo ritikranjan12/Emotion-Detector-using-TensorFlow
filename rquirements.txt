@@ -36,4 +36,4 @@ transformers==4.21.0
 urllib3==1.25.8
 vcstools==0.1.42
 virtualenv==20.13.1
-
+face-recognition

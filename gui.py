@@ -1,11 +1,12 @@
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import *
-
+import face_recognition
 import cv2
 from tensorflow.keras.models import model_from_json
 from PIL import Image,ImageTk
 import numpy as np
+from mouth_open import get_lip_height, get_mouth_height
 
 
 def facialExpressionModel(json_file,weights_file):
@@ -34,6 +35,23 @@ model = facialExpressionModel('model_a.json','model_weights.h5')
 
 Emotions = ['Angry','Disgust','Fear','Happy','Neutral','Sad','Surprise']
 
+def is_mouth_open(face_landmarks):
+    top_lip = face_landmarks['top_lip']
+    bottom_lip = face_landmarks['bottom_lip']
+
+    top_lip_height = get_lip_height(top_lip)
+    bottom_lip_height = get_lip_height(bottom_lip)
+    mouth_height = get_mouth_height(top_lip, bottom_lip)
+    
+    ratio = 0.5
+    # print('top_lip_height: %.2f, bottom_lip_height: %.2f, mouth_height: %.2f, min*ratio: %.2f' 
+    #       % (top_lip_height,bottom_lip_height,mouth_height, min(top_lip_height, bottom_lip_height) * ratio))
+          
+    if mouth_height > min(top_lip_height, bottom_lip_height) * ratio:
+        return True
+    else:
+        return False
+
 def detect(file_path):
     global Label_packed
 
@@ -41,11 +59,12 @@ def detect(file_path):
 
     gray_img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     faces = facec.detectMultiScale(gray_img,1.3,5)
-    mouths =  mouthc.detectMultiScale(gray_img,1.3,5)
     eyes = eyec.detectMultiScale(gray_img,1.3,5)
     mout='Not Detected'
     eye='Closed'
+    final_image = face_recognition.load_image_file(file_path)
 
+    face_landmarks_list = face_recognition.face_landmarks(final_image)
     try:
         for(x,y,w,h) in faces:
             fc = gray_img[y:y+h,x:x+w]
@@ -54,15 +73,12 @@ def detect(file_path):
             res = Emotions[np.argmax(pred)]
             print(res)
 
-        for (ex,ey,ew,eh) in mouths:
-
-            #print(ex,ey,ew,eh)
-            if abs(ew-eh) <31:
-                mout = "Opened"
+        for face_landmarks in face_landmarks_list:
+            if(is_mouth_open(face_landmarks=face_landmarks)):
+                mout = "Mouth Opened"
             else:
-                mout = "Closed"              
+                mout = "Mouth Closed"
 
-            cv2.rectangle(gray_img,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
         for (ex,ey,ew,eh) in eyes:
             eye = 'Opened'
 
@@ -100,7 +116,7 @@ def upload_image():
 def live_Capture():
     emotion = []
     eye = ''
-    mouth = "Not Detected"
+    mout = "Not Detected"
     cap = cv2.VideoCapture(0)
 
     while True:
@@ -108,12 +124,13 @@ def live_Capture():
 
         succ,img = cap.read()
 
+
         global Label_packed
 
         gray_img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         faces = facec.detectMultiScale(gray_img,1.3,5)
-        mouths =  mouthc.detectMultiScale(gray_img,1.3,5)
         eyes = eyec.detectMultiScale(gray_img,1.3,5)
+        face_landmarks_list = face_recognition.face_landmarks(img)
 
         try:
             for(x,y,w,h) in faces:
@@ -141,8 +158,12 @@ def live_Capture():
         if len(emotion) > 5: 
             emotion = emotion[-5:]
 
-        for (ex,ey,ew,eh) in mouths:
-            cv2.rectangle(img,(ex,ey),(ex+ew,ey+eh),(0,255,0),2) 
+        for face_landmarks in face_landmarks_list:
+            ret_mouth_open = is_mouth_open(face_landmarks)
+            if ret_mouth_open is True:
+                mout = 'Mouth Opened'
+            else:
+                mout = 'Mouth Closed'
 
         for (ex,ey,ew,eh) in eyes:
             cv2.rectangle(img,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)   
@@ -150,6 +171,8 @@ def live_Capture():
 
         cv2.rectangle(img, (0,0), (640, 40), (245, 117, 16), -1)
         cv2.putText(img, ' '.join(emotion), (3,30), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(img, mout, (10,90), 
                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.imshow("Emotion Detector",img)
 
